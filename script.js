@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentStepEgg = 0;
 
     let currentStepSlap = 0;
-    let currentStepPoop = 0; // New state
+    let currentStepPoop = 0;
+    let currentStepStamp = 0; // New state
     const maxSteps = 5;
     let baseImage = new Image();
     let faceLandmarks = null;
@@ -25,7 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let placedEggs = [];
 
     let placedSlaps = [];
-    let placedPoops = []; // Store poop positions
+    let placedPoops = [];
+    let placedStamps = []; // Store stamp positions
     let markerSequence = [];
 
     // Preload Slap Assets
@@ -51,6 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
             loadingDiv.classList.remove('hidden');
             await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
             await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+            await faceapi.nets.ageGenderNet.loadFromUri(MODEL_URL); // Load Gender Model
             modelsLoaded = true;
             console.log("Models loaded");
         } catch (error) {
@@ -92,11 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
         currentStepFlour = 0;
         currentStepEgg = 0;
         currentStepSlap = 0;
-
         currentStepPoop = 0;
+        currentStepStamp = 0;
         placedEggs = [];
         placedSlaps = [];
         placedPoops = [];
+        placedStamps = [];
 
         // Clear flies
         const flyContainer = document.getElementById('flyContainer');
@@ -115,7 +119,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const detectorOptions = new faceapi.TinyFaceDetectorOptions({ inputSize: 608, scoreThreshold: 0.4 });
-            const detection = await faceapi.detectSingleFace(baseImage, detectorOptions).withFaceLandmarks();
+            // Enable Gender Detection
+            const detection = await faceapi.detectSingleFace(baseImage, detectorOptions).withFaceLandmarks().withAgeAndGender();
 
             if (detection) {
                 faceLandmarks = detection.landmarks;
@@ -203,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateUI() {
-        const total = currentStepMarker + currentStepFlour + currentStepEgg + currentStepSlap + currentStepPoop;
+        const total = currentStepMarker + currentStepFlour + currentStepEgg + currentStepSlap + currentStepPoop + currentStepStamp;
         tortureCountSpan.textContent = total;
 
         tortureBtn.disabled = currentStepMarker >= maxSteps;
@@ -223,7 +228,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const slapBtn = document.getElementById('slapBtn');
         slapBtn.disabled = currentStepSlap >= maxSteps;
+        slapBtn.disabled = currentStepSlap >= maxSteps;
         slapBtn.textContent = currentStepSlap >= maxSteps ? "PIPI MERAH!" : "🤚 TAMPAR WAJAH!";
+
+        const stampBtn = document.getElementById('stampBtn');
+        if (stampBtn) {
+            stampBtn.disabled = currentStepStamp >= 3; // Max 3 stamps (big size)
+            stampBtn.textContent = currentStepStamp >= 3 ? "PENUH CAP!" : "🛑 STEMPEL JIDAT!";
+        }
     }
 
     tortureBtn.addEventListener('click', () => {
@@ -279,6 +291,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 spawnFlies(targetData);
             }, 500);
 
+            updateUI();
+        });
+    }
+
+    const stampBtn = document.getElementById('stampBtn');
+    if (stampBtn) {
+        stampBtn.addEventListener('click', () => {
+            // Limit to 3 stamps
+            if (currentStepStamp >= 3) return;
+
+            // 1. Determine "Aib" based on Gender
+            let stamps = ['stamp_ditolak.png', 'stamp_buronan.png', 'stamp_hutang.png'];
+
+            // Smart Logic: Gender based
+            if (faceLandmarks && faceLandmarks.gender) {
+                const gender = faceLandmarks.gender;
+                // Add logic if we had specific gender stamps, for now Jomblo matches all
+            }
+            stamps.push('stamp_jomblo.png');
+
+            const randomStamp = stamps[Math.floor(Math.random() * stamps.length)];
+
+            // 2. Calculate Target
+            const targetData = calculateStampTarget();
+
+            if (!targetData) {
+                alert("Jidatnya udah penuh aib bro!");
+                return;
+            }
+
+            // 3. Apple Stamp
+            currentStepStamp++;
+            applyStamp(targetData, randomStamp);
             updateUI();
         });
     }
@@ -1098,6 +1143,96 @@ document.addEventListener('DOMContentLoaded', () => {
 
             }, landTime);
         }
+    }
+
+    // --- STAMP LOGIC ---
+
+    function calculateStampTarget() {
+        if (!faceLandmarks) return null;
+
+        const w = canvas.width;
+        const h = canvas.height;
+
+        // Zones: Prioritize Forehead (idx 27 is between eyes, 19-24 are eyebrows)
+        // We approximate forehead by going UP from the nose bridge (27)
+        const noseBridgeTop = faceLandmarks.positions[27];
+        const point = mapPoint(noseBridgeTop);
+
+        // Define a "Forehead Box" area
+        // Shift up by 15-25% of height
+
+        let bestTx = 0, bestTy = 0, bestSize = 0;
+        let foundSpot = false;
+
+        for (let attempt = 0; attempt < 20; attempt++) {
+            // Randomize position on forehead
+            const jitterX = (Math.random() - 0.5) * (w * 0.2);
+            // Y is biased to be ABOVE the eyes
+            const jitterY = - (h * 0.1) + (Math.random() - 0.5) * (h * 0.1);
+
+            const tx = point.x + jitterX;
+            const ty = point.y + jitterY;
+            const size = w * 0.35; // Stamps are BIG
+
+            // Collision Check
+            let overlap = false;
+            for (const item of [...placedSlaps, ...placedEggs, ...placedPoops, ...placedStamps]) {
+                const dx = tx - item.x;
+                const dy = ty - item.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < (size + (item.size || size)) * 0.4) {
+                    overlap = true;
+                    break;
+                }
+            }
+
+            if (!overlap) {
+                bestTx = tx;
+                bestTy = ty;
+                bestSize = size;
+                foundSpot = true;
+                break;
+            }
+        }
+
+        if (foundSpot) {
+            placedStamps.push({ x: bestTx, y: bestTy, size: bestSize });
+            return { x: bestTx, y: bestTy, size: bestSize };
+        }
+        return null;
+    }
+
+    function applyStamp(target, stampSrc) {
+        const img = new Image();
+        img.src = stampSrc;
+
+        // Play audio if available (TODO)
+
+        // Screen Shake Logic (Re-used)
+        const canvasContainer = document.getElementById('canvas-container');
+        canvasContainer.classList.remove('shake-hard');
+        void canvasContainer.offsetWidth; // trigger reflow
+        canvasContainer.classList.add('shake-hard');
+        setTimeout(() => {
+            canvasContainer.classList.remove('shake-hard');
+        }, 500);
+
+        img.onload = () => {
+            ctx.save();
+            ctx.translate(target.x, target.y);
+            // Random rotation (-15 to +15 deg)
+            const angle = (Math.random() - 0.5) * 0.5;
+            ctx.rotate(angle);
+
+            // "Multiply" blend mode makes ink look like it's ON the skin
+            ctx.globalCompositeOperation = 'multiply';
+            // Slight opacity for realism
+            ctx.globalAlpha = 0.9;
+
+            ctx.drawImage(img, -target.size / 2, -target.size / 2, target.size, target.size / 2.5); // Aspect ratio fix (stamps are rectangular)
+
+            ctx.restore();
+        };
     }
 
     function setupMarker(color, width) {
