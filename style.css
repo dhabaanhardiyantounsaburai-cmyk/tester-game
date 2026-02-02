@@ -1,0 +1,468 @@
+:root {
+    --primary: #ff0055;
+    --primary-dark: #cc0044;
+    --dark: #121212;
+    --darker: #0a0a0a;
+    --light: #eeeeee;
+    --accent: #00ffcc;
+    --white: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--darker);
+    color: var(--light);
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px;
+    background-color: var(--dark);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    text-align: center;
+    border: 2px solid #333;
+}
+
+header h1 {
+    font-family: 'Creepster', cursive;
+    color: var(--primary);
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 0px #000;
+}
+
+header p {
+    color: #888;
+    margin-bottom: 30px;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: linear-gradient(45deg, var(--primary), #ff4444);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 5px 15px rgba(255, 0, 85, 0.4);
+}
+
+.upload-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255, 0, 85, 0.6);
+}
+
+.upload-btn input {
+    display: none;
+}
+
+.canvas-container {
+    margin: 20px 0;
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    background-color: #222;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+.controls {
+    margin-top: 20px;
+}
+
+.stats {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.torture-btn,
+.flour-btn {
+    background: var(--accent);
+    color: var(--darker);
+    border: none;
+    padding: 15px 10px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Creepster', cursive;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+    box-shadow: 0 5px 0 #00ccaa;
+}
+
+.flour-btn {
+    background: var(--white);
+    color: var(--dark);
+    box-shadow: 0 5px 0 #ccc;
+}
+
+.flour-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.torture-btn:active,
+.flour-btn:active {
+    transform: translateY(5px);
+    box-shadow: none;
+}
+
+.torture-btn:disabled,
+.flour-btn:disabled {
+    background-color: #555;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+.secondary-btn,
+.download-btn {
+    background: transparent;
+    border: 2px solid #555;
+    color: #888;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.secondary-btn:hover {
+    border-color: var(--light);
+    color: var(--light);
+}
+
+.download-btn {
+    border-color: var(--primary);
+    color: var(--primary);
+    margin-top: 20px;
+}
+
+.download-btn:hover {
+    background-color: var(--primary);
+    color: white;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.message {
+    height: 20px;
+    color: var(--primary);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--primary);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.egg-btn {
+    background: linear-gradient(145deg, #fbc02d, #f57f17);
+    color: #fff;
+    border: 3px solid #ff6f00;
+}
+
+.egg-btn:hover {
+    box-shadow: 0 0 15px #fbc02d;
+    transform: scale(1.05) rotate(1deg);
+}
+
+.egg-btn:active {
+    transform: scale(0.95);
+}
+
+.egg-btn:disabled {
+    background: #555;
+    border-color: #333;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Slap Button */
+.slap-btn {
+    background: linear-gradient(145deg, #d32f2f, #b71c1c);
+    color: #fff;
+    border: 3px solid #ff5252;
+}
+
+.slap-btn:hover {
+    box-shadow: 0 0 15px #d32f2f;
+    transform: scale(1.05) rotate(-1deg);
+}
+
+.slap-btn:active {
+    transform: scale(0.95);
+}
+
+.slap-btn:disabled {
+    background: #555;
+    border-color: #333;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Slap Overlay & Animation */
+.slap-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 20;
+    overflow: hidden;
+}
+
+.slap-hand {
+    position: absolute;
+    width: 300px;
+    /* Adjust based on image size */
+    opacity: 0;
+    transform: translateX(100%) rotate(20deg);
+    /* Start off-screen right */
+}
+
+/* Animation Classes */
+.animate-slap {
+    animation: slapAction 1.5s ease-out forwards;
+    /* Slow motion slap */
+}
+
+@keyframes slapAction {
+    0% {
+        opacity: 0;
+        /* Start from right (relative to container) */
+        transform: translate(120%, -20%) rotate(20deg) scale(1.5);
+    }
+
+    40% {
+        opacity: 1;
+        /* Impact at calculated target coordinates */
+        transform: translate(var(--tx, -50%), var(--ty, 10%)) rotate(0deg) scale(1);
+    }
+
+    50% {
+        /* Squash at target */
+        transform: translate(var(--tx, -50%), var(--ty, 10%)) rotate(-5deg) scale(0.95);
+    }
+
+    100% {
+        opacity: 0;
+        /* Follow through to left */
+        transform: translate(-100%, 20%) rotate(-30deg) scale(1);
+    }
+}
+
+.slap-impact {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+    /* Centered on target */
+    pointer-events: none;
+    z-index: 25;
+}
+
+.animate-impact {
+    animation: impactAction 1.0s ease-out forwards;
+    /* 1 second duration */
+}
+
+@keyframes impactAction {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(15deg);
+        /* POP! */
+    }
+
+    80% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.2) rotate(15deg);
+        /* HOLD */
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5) rotate(30deg);
+        /* FADE */
+    }
+}
+
+/* Shake Effect */
+.shake-hard {
+    animation: shake 0.5s cubic-bezier(.36, .07, .19, .97) both;
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    perspective: 1000px;
+}
+
+@keyframes shake {
+
+    10%,
+    90% {
+        transform: translate3d(-4px, 0, 0);
+    }
+
+    20%,
+    80% {
+        transform: translate3d(6px, 0, 0);
+    }
+
+    30%,
+    50%,
+    70% {
+        transform: translate3d(-10px, 0, 0);
+    }
+
+    40%,
+    60% {
+        transform: translate3d(10px, 0, 0);
+    }
+}
+
+/* Poop Button */
+.poop-btn {
+    background: linear-gradient(145deg, #795548, #5d4037);
+    color: #fff;
+    border: 3px solid #8d6e63;
+}
+
+.poop-btn:hover {
+    box-shadow: 0 0 15px #795548;
+    transform: scale(1.05) rotate(1deg);
+}
+
+.poop-btn:active {
+    transform: scale(0.95);
+}
+
+.poop-btn:disabled {
+    background: #555;
+    border-color: #333;
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Fly Animation */
+.fly-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 15;
+    overflow: hidden;
+}
+
+.fly {
+    position: absolute;
+    width: 25px;
+    height: 25px;
+    background-image: url('fly_insect.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    pointer-events: none;
+    z-index: 30;
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+}
+
+.fly-active {
+    animation: flyBuzz 2s infinite ease-in-out;
+}
+
+@keyframes flyBuzz {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(20px, -20px) rotate(45deg);
+    }
+
+    50% {
+        transform: translate(-10px, 30px) rotate(90deg);
+    }
+
+    75% {
+        transform: translate(-30px, -10px) rotate(180deg);
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(360deg);
+    }
+}
