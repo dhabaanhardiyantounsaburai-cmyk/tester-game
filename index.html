@@ -11,60 +11,104 @@
 </head>
 
 <body>
+    <!-- <div id="debugLog"></div> REMOVED FOR PRODUCTION -->
     <div class="container">
         <header>
             <h1>😈 Wajah Siksaan 😈</h1>
             <p>Upload foto temanmu dan mulailah penderitaannya!</p>
+            <div id="modelStatus" class="model-status loading">⏳ Sedang memuat AI... (Harap Tunggu)</div>
         </header>
 
         <main>
-            <div class="upload-section" id="upload-section">
-                <label for="imageUpload" class="upload-btn">
-                    <span>📷 Upload Foto Korban</span>
-                    <input type="file" id="imageUpload" accept="image/*">
-                </label>
+            <!-- STAGE 1: SETUP AREA (Split Screen) -->
+            <div class="battle-arena">
+
+                <!-- PLAYER SIDE (LEFT) -->
+                <div class="fighter-card" id="playerSide">
+                    <div class="card-header">
+                        <h2>YOU</h2>
+                        <span class="hp-text" id="playerHPText">100%</span>
+                    </div>
+                    <div class="media-frame">
+                        <video id="webcamVideo" autoplay playsinline muted class="hidden"></video>
+                        <canvas id="playerCanvas" class="battle-canvas hidden"></canvas>
+                        <div id="playerPlaceholder" class="placeholder-box">
+                            <span class="icon">😊</span>
+                            <p>Wajah Kamu</p>
+                            <small>(Wajib Selfie)</small>
+                        </div>
+                        <div id="playerOverlay" class="torture-overlay"></div>
+                    </div>
+                    <div class="action-area">
+                        <button id="cameraBtn" class="primary-btn">📸 Buka Kamera</button>
+                        <button id="captureBtn" class="flash-btn hidden">⚡ JEPRET!</button>
+                        <button id="retakeBtn" class="secondary-btn hidden">🔄 Foto Ulang</button>
+                    </div>
+                    <div class="health-bar-container">
+                        <div class="health-fill" id="playerHPBar" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- CENTER CONTROL (VS) -->
+                <div class="center-stage">
+                    <div class="vs-logo">VS</div>
+
+                    <!-- SUIT CONTROLS -->
+                    <div id="suitPanel" class="suit-panel hidden">
+                        <p>PILIH SENJATA!</p>
+                        <div class="suit-buttons">
+                            <button class="suit-btn" data-choice="batu">✊</button>
+                            <button class="suit-btn" data-choice="kertas">✋</button>
+                            <button class="suit-btn" data-choice="gunting">✌️</button>
+                        </div>
+                    </div>
+
+                    <!-- BATTLE RESULT -->
+                    <div id="battleResult" class="battle-result hidden">
+                        <span id="resultIcon">🤔</span>
+                        <p id="resultText">...</p>
+                    </div>
+
+                    <button id="startBattleBtn" class="start-btn hidden" disabled>⚔️ MULAI SIKSAAN ⚔️</button>
+                </div>
+
+                <!-- ENEMY SIDE (RIGHT) -->
+                <div class="fighter-card" id="enemySide">
+                    <div class="card-header">
+                        <h2>ENEMY</h2>
+                        <span class="hp-text" id="enemyHPText">100%</span>
+                    </div>
+                    <div class="media-frame">
+                        <canvas id="enemyCanvas" class="battle-canvas hidden"></canvas> <!-- Formerly prankCanvas -->
+                        <label for="enemyUpload" id="enemyPlaceholder" class="placeholder-box clickable">
+                            <span class="icon">😈</span>
+                            <p>Wajah Teman</p>
+                            <small>(Klik Upload)</small>
+                            <input type="file" id="enemyUpload" accept="image/*" class="hidden">
+                        </label>
+                        <div id="enemyOverlay" class="torture-overlay"></div>
+                    </div>
+                    <div class="action-area">
+                        <!-- Torture Buttons appear here when Player Wins -->
+                        <div id="tortureDeck" class="torture-deck disabled">
+                            <button class="t-btn" data-type="makeup">💄</button>
+                            <button class="t-btn" data-type="slap">🤚</button>
+                            <button class="t-btn" data-type="poop">💩</button>
+                            <button class="t-btn" data-type="warp">🥴</button>
+                            <button class="t-btn" data-type="punch">🥊</button>
+                        </div>
+                        <p class="deck-status">Menang Suit dulu!</p>
+                    </div>
+                    <div class="health-bar-container">
+                        <div class="health-fill" id="enemyHPBar" style="width: 100%;"></div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="canvas-container hidden" id="canvas-container">
-                <canvas id="prankCanvas"></canvas>
-                <div id="loading" class="loading-overlay hidden">
-                    <div class="spinner"></div>
-                    <p>Sedang mendeteksi wajah korban...</p>
-                </div>
-                <!-- Slap Animation Overlay (Moved inside for coords) -->
-                <div id="slapOverlay" class="slap-overlay hidden">
-                    <img src="hand_slap.png" id="slapHand" class="slap-hand" alt="Slap Hand">
-                    <img src="impact_slap.png?v=custom" id="slapImpact" class="slap-impact hidden" alt="Impact Effect">
-                </div>
-                <div id="flyContainer" class="fly-container"></div>
-            </div>
-
-            <div class="controls hidden" id="controls">
-                <div class="stats">
-                    <p>Siksaan: <span id="torture-count">0</span> / 5</p>
-                </div>
-                <div class="button-grid">
-                    <button id="tortureBtn" class="torture-btn">
-                        🖊️ CORET WAJAH!
-                    </button>
-                    <button id="flourBtn" class="flour-btn">
-                        ☁️ LEMPAR TEPUNG!
-                    </button>
-                    <button id="eggBtn" class="egg-btn">
-                        🥚 LEMPAR TELUR!
-                    </button>
-                    <button id="poopBtn" class="poop-btn">
-                        💩 LEMPAR KOTORAN!
-                    </button>
-                    <button id="stampBtn" class="stamp-btn">
-                        🛑 STEMPEL JIDAT!
-                    </button>
-                    <button id="slapBtn" class="slap-btn">
-                        🤚 TAMPAR WAJAH!
-                    </button>
-                </div>
-                <div class="message" id="message"></div>
-                <button id="resetBtn" class="secondary-btn">🔄 Ulangi dari Awal</button>
+            <!-- HIDDEN ELEMENTS FOR ASSETS -->
+            <div class="hidden-assets">
+                <!-- Reusing existing asset loading logic via JS mostly -->
             </div>
         </main>
 
@@ -73,9 +117,9 @@
         </footer>
     </div>
 
-    <!-- Face API -->
-    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-    <script defer src="script.js?v=40"></script>
+    <!-- Face API (Local) -->
+    <script defer src="face-api.min.js"></script>
+    <script defer src="script.js?v=63"></script>
 </body>
 
 </html>

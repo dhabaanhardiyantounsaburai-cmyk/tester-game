@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wajah Siksaan - Prank Temanmu!</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@400;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>😈 Wajah Siksaan 😈</h1>
+            <p>Upload foto temanmu dan mulailah penderitaannya!</p>
+        </header>
+
+        <main>
+            <div class="upload-section" id="upload-section">
+                <label for="imageUpload" class="upload-btn">
+                    <span>📷 Upload Foto Korban</span>
+                    <input type="file" id="imageUpload" accept="image/*">
+                </label>
+            </div>
+
+            <div class="canvas-container hidden" id="canvas-container">
+                <canvas id="prankCanvas"></canvas>
+                <div id="loading" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                    <p>Sedang mendeteksi wajah korban...</p>
+                </div>
+                <!-- Slap Animation Overlay (Moved inside for coords) -->
+                <div id="slapOverlay" class="slap-overlay hidden">
+                    <img src="hand_slap.png" id="slapHand" class="slap-hand" alt="Slap Hand">
+                    <img src="impact_slap.png?v=custom" id="slapImpact" class="slap-impact hidden" alt="Impact Effect">
+                </div>
+                <div id="flyContainer" class="fly-container"></div>
+            </div>
+
+            <div class="controls hidden" id="controls">
+                <div class="stats">
+                    <p>Siksaan: <span id="torture-count">0</span> / 5</p>
+                    <div id="faceStatus" class="face-status hidden"></div>
+                </div>
+                <div class="button-grid">
+                    <button id="tortureBtn" class="torture-btn">
+                        🖊️ CORET WAJAH!
+                    </button>
+                    <button id="flourBtn" class="flour-btn">
+                        ☁️ LEMPAR TEPUNG!
+                    </button>
+                    <button id="eggBtn" class="egg-btn">
+                        🥚 LEMPAR TELUR!
+                    </button>
+                    <button id="poopBtn" class="poop-btn">
+                        💩 LEMPAR KOTORAN!
+                    </button>
+                    <button id="stampBtn" class="stamp-btn">
+                        🛑 STEMPEL JIDAT!
+                    </button>
+                    <button id="warpBtn" class="warp-btn">
+                        🥴 PENYOKIN WAJAH!
+                    </button>
+                    <button id="makeupBtn" class="makeup-btn">
+                        💄 MAKEUP CEMONG!
+                    </button>
+                    <button id="slapBtn" class="slap-btn">
+                        🤚 TAMPAR WAJAH!
+                    </button>
+                </div>
+                <div class="message" id="message"></div>
+                <button id="resetBtn" class="secondary-btn">🔄 Ulangi dari Awal</button>
+            </div>
+        </main>
+
+        <footer>
+            <button id="downloadBtn" class="download-btn hidden">💾 Simpan Hasil Karya</button>
+        </footer>
+    </div>
+
+    <!-- Face API -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <script defer src="script.js?v=61"></script>
+</body>
+
+</html>
